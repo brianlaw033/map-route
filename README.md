@@ -58,29 +58,9 @@ Deploying an application to Heroku involves several steps, including setting up 
 ## Prerequisites
 
 -   A Heroku account. If you don't have one, sign up at [Heroku](https://signup.heroku.com/).
--   [Git](https://git-scm.com/) installed on your local machine.
 -   [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) installed on your local machine.
 
-## Step 1: Prepare Your Application
-
-Ensure your application is ready for deployment. This typically involves:
-
--   A `Procfile` that specifies the commands needed to run your app.
--   A `requirements.txt` or `package.json` file that lists dependencies.
-
-### Example `Procfile` for a Node.js app
-
-```
-web: node index.js
-```
-
-### Example `Procfile` for a Python (Flask) app
-
-```
-web: gunicorn app:app
-```
-
-## Step 2: Log In to Heroku
+## Step 1: Log In to Heroku
 
 Open your terminal and log in to Heroku using the CLI:
 
@@ -90,45 +70,27 @@ heroku login
 
 A web browser will open, prompting you to log in to your Heroku account.
 
-## Step 3: Create a New Heroku App
+## Step 2: Create a New Heroku App
 
 Navigate to your project directory and create a new Heroku app:
 
 ```bash
 cd /path/to/your/project
-heroku create
+heroku apps:create <your-app-name>
 ```
 
 This command will create a new Heroku app and link it to your project. You will see a URL for your new Heroku app.
+You might need to visit the link if failed to create and fill in your payment method.
+
+## Step 3: Add the nginx Buildpack
+
+```bash
+heroku buildpacks:add heroku-community/nginx -a <your-app-name>
+```
 
 ## Step 4: Deploy Your Application
 
-### Initialize a Git Repository (if not already done)
-
-If your project is not already a Git repository, initialize one:
-
-```bash
-git init
-```
-
-### Commit Your Code
-
-Add your files to the Git repository and commit them:
-
-```bash
-git add .
-git commit -m "Initial commit"
-```
-
 ### Push to Heroku
-
-Deploy your application by pushing to the Heroku remote:
-
-```bash
-git push heroku master
-```
-
-For apps using the main branch (Git version 2.28.0 or later):
 
 ```bash
 git push heroku main
@@ -144,27 +106,12 @@ Once the deployment is complete, you can open your application in the browser:
 heroku open
 ```
 
-## Step 6: Manage Environment Variables (Optional)
+## Step 6: Manage Environment Variables
 
 If your application requires environment variables, you can set them using the Heroku CLI. For example:
 
 ```bash
-heroku config:set SECRET_KEY=mysecretkey
+heroku config:set VITE_MAPBOX_ACCESS_TOKEN=<your-mapbox-api-key>
 ```
-
-## Step 7: Monitor Your Application
-
-You can monitor your application and view logs using the following command:
-
-```bash
-heroku logs --tail
-```
-
-## Additional Resources
-
--   [Heroku Dev Center](https://devcenter.heroku.com/)
--   [Heroku CLI Documentation](https://devcenter.heroku.com/articles/heroku-cli)
 
 ---
-
-This guide should help you deploy your application to Heroku successfully.
