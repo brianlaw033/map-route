@@ -1,96 +1,11 @@
 import { FormEvent, useState } from "react"
 import Map, { Layer, Source } from "react-map-gl"
+import { getRouteToken, getRoute, getDirection } from "./api"
+import type { AxiosError } from "axios"
+import type { MapboxDirectionsResponse } from "./types"
 import "./App.css"
-import Mapboxgl from "mapbox-gl"
-import axios, { AxiosError } from "axios"
 
-const api = "https://sg-mock-api.lalamove.com"
-
-Mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
-
-type Path = [number, number][]
-
-type MapboxDirections = {
-    code: string
-    uuid: string
-    waypoints: {
-        distance: number
-        name: string
-        location: [number, number]
-    }[]
-    routes: {
-        distance: number
-        duration: number
-        geometry: {
-            coordinates: [number, number][]
-            type: string
-        }
-        legs: {
-            via_waypoints: []
-            admins: {
-                iso_3166_1: string
-                iso_3166_1_alpha3: string
-            }[]
-            distance: number
-            duration: number
-            steps: []
-            summary: string
-            weight: number
-        }[]
-        weight: number
-        weight_name: string
-    }[]
-}
-
-const STATUS = {
-    IN_PROGRESS: "in progress",
-    SUCCESS: "success",
-    FAILURE: "failure",
-}
-
-const getRouteToken = async (origin: string, destination: string) => {
-    try {
-        const response = await axios.post(`${api}/route`, {
-            origin,
-            destination,
-        })
-        return response.data.token
-    } catch (err) {
-        throw err
-    }
-}
-
-const getRoute = async (token: string) =>
-    new Promise<any>(async (resolve, reject) => {
-        try {
-            //const response = await axios.get(`${api}/route/${token}`);
-            const response = await axios.get(`${api}/mock/route/success`)
-            if (response.data.status === STATUS.IN_PROGRESS) {
-                setTimeout(() => getRoute(token), 500)
-                return
-            }
-            if (response.data.status === STATUS.FAILURE) {
-                reject({ message: response.data.error })
-            }
-            resolve(response.data)
-        } catch (err) {
-            reject(err)
-        }
-    })
-
-const getDirection = async (path: Path) => {
-    try {
-        const lngLatPath = path.map((point) => [point[1], point[0]])
-        const response = await axios.get(
-            `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${lngLatPath.join(
-                ";",
-            )}?geometries=geojson&access_token=${Mapboxgl.accessToken}`,
-        )
-        return response.data
-    } catch (err) {
-        throw err
-    }
-}
+const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
 
 function App() {
     const [origin, setOrigin] = useState("")
@@ -116,7 +31,7 @@ function App() {
         }
     }
 
-    const onRetreiveDirection = (direction: MapboxDirections) => {
+    const onRetreiveDirection = (direction: MapboxDirectionsResponse) => {
         const data = direction.routes[0]
         const coordinates = data.geometry.coordinates
         const routeGeojson = {
@@ -165,6 +80,7 @@ function App() {
                 }}
                 style={{ width: 600, height: 400 }}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
+                accessToken={accessToken}
             >
                 {routeGeojson && (
                     <Source id="route" type="geojson" data={routeGeojson}>
