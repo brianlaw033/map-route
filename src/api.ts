@@ -1,5 +1,5 @@
 import axios from "axios"
-import { TokenResponse, RouteResponse, Path, MapboxDirectionsResponse } from "./types"
+import type { TokenResponse, RouteResponse, Path, MapboxDirectionsResponse } from "./types"
 const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
 
 const api = "https://sg-mock-api.lalamove.com"
@@ -26,14 +26,18 @@ export function poll<T>(fn: () => Promise<T>, retryCondition: (result: T) => boo
     let attempts = 0
 
     const executePoll = async (resolve: (result: T) => void, reject: (error: any) => void) => {
-        const result = await fn()
-        attempts++
-        if (!retryCondition(result)) {
-            resolve(result)
-        } else if (attempts === maxAttempts) {
-            reject(new Error("Try again later"))
-        } else {
-            setTimeout(executePoll, interval, resolve, reject)
+        try {
+            const result = await fn()
+            attempts++
+            if (!retryCondition(result)) {
+                resolve(result)
+            } else if (attempts === maxAttempts) {
+                reject(new Error("Try again later"))
+            } else {
+                setTimeout(executePoll, interval, resolve, reject)
+            }
+        } catch (err) {
+            reject(err)
         }
     }
 
@@ -44,6 +48,9 @@ export const getRoute = async (token: string): Promise<RouteResponse> =>
     poll(
         async () => {
             const response = await axios.get<RouteResponse>(`${api}/route/${token}`)
+            if (response.data.status === STATUS.FAILURE) {
+                throw new Error(response.data.error)
+            }
             return response.data
         },
         (data) => data.status === STATUS.IN_PROGRESS,
