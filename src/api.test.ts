@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest"
 import axios from "axios"
 import MockAdapter from "axios-mock-adapter"
-import { MapboxDirectionsResponse, Path } from "./types"
 import { poll, getDirection, getRouteToken } from "./api"
+import type { MapboxDirectionsResponse, Path } from "./types"
 
 describe("poll function", () => {
     it("should resolve when fn resolves and retryCondition is false", async () => {

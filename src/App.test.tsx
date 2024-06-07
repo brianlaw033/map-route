@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, Mock } from "vitest"
 import App from "./App"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import "@testing-library/jest-dom"
 import { getRouteToken, getRoute, getDirection } from "./api"
+import "@testing-library/jest-dom"
 
 vi.mock("./api", () => ({
     getRouteToken: vi.fn(),
