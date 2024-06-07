@@ -19,7 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["jest", "jest-dom"],
+    "types": ["jest-dom"],
     "typeRoots": ["node_modules/@types", "node_modules/@testing-library"]
   },
   "include": ["src"],
