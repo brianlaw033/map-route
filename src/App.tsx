@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react"
 import Map, { Layer, Source } from "react-map-gl"
+import Mapboxgl from "mapbox-gl"
 import { getRouteToken, getRoute, getDirection } from "./api"
 import type { AxiosError } from "axios"
 import type { MapboxDirectionsResponse } from "./types"
 import "./App.css"
 
-const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
+Mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
 
 function App() {
     const [origin, setOrigin] = useState("")
@@ -80,7 +81,6 @@ function App() {
                 }}
                 style={{ width: 600, height: 400 }}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
-                accessToken={accessToken}
             >
                 {routeGeojson && (
                     <Source id="route" type="geojson" data={routeGeojson}>
