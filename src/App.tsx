@@ -1,12 +1,21 @@
 import { FormEvent, useState } from "react"
 import Map, { Layer, Source } from "react-map-gl"
 import Mapboxgl from "mapbox-gl"
-import { getRouteToken, getRoute, getDirection } from "./api"
 import type { AxiosError } from "axios"
+import { Button, TextField } from "@mui/material"
+import { ThemeProvider, createTheme } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { getRouteToken, getRoute, getDirection } from "./api"
 import type { MapboxDirectionsResponse } from "./types"
-import "./App.css"
+import "mapbox-gl/dist/mapbox-gl.css"
 
 Mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
+
+const darkTheme = createTheme({
+    palette: {
+        mode: "dark",
+    },
+})
 
 function App() {
     const [origin, setOrigin] = useState("")
@@ -59,18 +68,28 @@ function App() {
     }
 
     return (
-        <div>
-            <form onSubmit={onSubmitAddresses}>
-                <input name="origin" placeholder="Origin" autoComplete="address-line1" onChange={(e) => setOrigin(e.target.value)} />
-                <input
+        <ThemeProvider theme={darkTheme}>
+            <form onSubmit={onSubmitAddresses} style={{ display: "flex", justifyContent: "center" }}>
+                <TextField
+                    id="outlined-basic"
+                    label="Origin"
+                    variant="outlined"
+                    name="origin"
+                    autoComplete="address-line1"
+                    sx={{ height: "42px" }}
+                    onChange={(e) => setOrigin(e.target.value)}
+                />
+                <TextField
+                    id="outlined-basic"
+                    label="Destination"
+                    variant="outlined"
                     name="destination"
-                    placeholder="Destination"
                     autoComplete="address-line1"
                     onChange={(e) => setDestination(e.target.value)}
                 />
-                <button type="submit" disabled={isLoading}>
+                <Button variant="contained" type="submit" disabled={isLoading} size="large">
                     {isLoading ? "Loading..." : "Submit"}
-                </button>
+                </Button>
             </form>
             <div>{error}</div>
             <Map
@@ -79,7 +98,7 @@ function App() {
                     latitude: 22.31,
                     zoom: 10,
                 }}
-                style={{ width: 600, height: 400 }}
+                style={{ width: "95vw", height: "80vh" }}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
             >
                 {routeGeojson && (
@@ -119,7 +138,7 @@ function App() {
                     </Source>
                 )}
             </Map>
-        </div>
+        </ThemeProvider>
     )
 }
 
