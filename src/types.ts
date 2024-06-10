@@ -1,14 +1,15 @@
 export type Path = [number, number][]
 export type RouteResponse = { status: string; path: Path; error?: string }
 export type TokenResponse = { token: string }
+export type MapboxDirectionWaypoint = {
+    distance: number
+    name: string
+    location: [number, number]
+}
 export type MapboxDirectionsResponse = {
     code: string
     uuid: string
-    waypoints: {
-        distance: number
-        name: string
-        location: [number, number]
-    }[]
+    waypoints: MapboxDirectionWaypoint[]
     routes: {
         distance: number
         duration: number

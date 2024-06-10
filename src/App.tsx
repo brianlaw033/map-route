@@ -4,9 +4,9 @@ import Mapboxgl from "mapbox-gl"
 import type { AxiosError } from "axios"
 import { Button, TextField } from "@mui/material"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import useMediaQuery from "@mui/material/useMediaQuery"
+import { Feature, Geometry, GeoJsonProperties, FeatureCollection } from "geojson"
 import { getRouteToken, getRoute, getDirection } from "./api"
-import type { MapboxDirectionsResponse } from "./types"
+import type { MapboxDirectionWaypoint, MapboxDirectionsResponse } from "./types"
 import "mapbox-gl/dist/mapbox-gl.css"
 
 Mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string
@@ -22,8 +22,8 @@ function App() {
     const [destination, setDestination] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
-    const [routeGeojson, setRouteGeojson] = useState<any>(null)
-    const [waypoints, setWaypoints] = useState<any>(null)
+    const [routeGeojson, setRouteGeojson] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
+    const [waypoints, setWaypoints] = useState<FeatureCollection<Geometry, GeoJsonProperties> | null>(null)
 
     const onSubmitAddresses = async (event: FormEvent<HTMLFormElement>) => {
         try {
@@ -44,7 +44,7 @@ function App() {
     const onRetreiveDirection = (direction: MapboxDirectionsResponse) => {
         const data = direction.routes[0]
         const coordinates = data.geometry.coordinates
-        const routeGeojson = {
+        const routeGeojson: Feature<Geometry, GeoJsonProperties> = {
             type: "Feature",
             properties: {},
             geometry: {
@@ -53,9 +53,9 @@ function App() {
             },
         }
         setRouteGeojson(routeGeojson)
-        const waypointsGeoJson = {
+        const waypointsGeoJson: FeatureCollection<Geometry, GeoJsonProperties> = {
             type: "FeatureCollection",
-            features: direction.waypoints.map((waypoint: any, i: number) => ({
+            features: direction.waypoints.map((waypoint: MapboxDirectionWaypoint, i: number) => ({
                 type: "Feature",
                 properties: { order: i + 1 },
                 geometry: {
@@ -75,6 +75,7 @@ function App() {
                     label="Origin"
                     variant="outlined"
                     name="origin"
+                    placeholder="Origin"
                     autoComplete="address-line1"
                     sx={{ height: "42px" }}
                     onChange={(e) => setOrigin(e.target.value)}
@@ -84,6 +85,7 @@ function App() {
                     label="Destination"
                     variant="outlined"
                     name="destination"
+                    placeholder="Destination"
                     autoComplete="address-line1"
                     onChange={(e) => setDestination(e.target.value)}
                 />
@@ -91,7 +93,7 @@ function App() {
                     {isLoading ? "Loading..." : "Submit"}
                 </Button>
             </form>
-            <div>{error}</div>
+            <div style={{ textAlign: "center" }}>{error}</div>
             <Map
                 initialViewState={{
                     longitude: 114.16,

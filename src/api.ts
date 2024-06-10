@@ -11,21 +11,17 @@ const STATUS = {
 }
 
 export const getRouteToken = async (origin: string, destination: string) => {
-    try {
-        const response = await axios.post<TokenResponse>(`${api}/route`, {
-            origin,
-            destination,
-        })
-        return response.data.token
-    } catch (err) {
-        throw err
-    }
+    const response = await axios.post<TokenResponse>(`${api}/route`, {
+        origin,
+        destination,
+    })
+    return response.data.token
 }
 
 export function poll<T>(fn: () => Promise<T>, retryCondition: (result: T) => boolean, interval: number, maxAttempts: number): Promise<T> {
     let attempts = 0
 
-    const executePoll = async (resolve: (result: T) => void, reject: (error: any) => void) => {
+    const executePoll = async (resolve: (result: T) => void, reject: (error: unknown) => void) => {
         try {
             const result = await fn()
             attempts++
@@ -59,15 +55,11 @@ export const getRoute = async (token: string): Promise<RouteResponse> =>
     )
 
 export const getDirection = async (path: Path) => {
-    try {
-        const lngLatPath = path.map((point) => [point[1], point[0]])
-        const response = await axios.get<MapboxDirectionsResponse>(
-            `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${lngLatPath.join(
-                ";",
-            )}?geometries=geojson&access_token=${accessToken}`,
-        )
-        return response.data
-    } catch (err) {
-        throw err
-    }
+    const lngLatPath = path.map((point) => [point[1], point[0]])
+    const response = await axios.get<MapboxDirectionsResponse>(
+        `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${lngLatPath.join(
+            ";",
+        )}?geometries=geojson&access_token=${accessToken}`,
+    )
+    return response.data
 }
